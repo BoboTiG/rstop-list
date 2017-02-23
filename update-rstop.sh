@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/sh -eu
 
 DEST="/etc/dnsmasq.d"
 
 easylist() {
 	echo -n 'Getting EasyList list ... '
-	out=$DEST/easylist.conf
-	tmp=$(mktemp)
+	local out=$DEST/easylist.conf
+	local tmp=$(mktemp)
 	wget -q -nv https://easylist-downloads.adblockplus.org/easylist.txt -O $tmp
 	egrep '^\|\|([a-Z\.]+)\^$' $tmp | cut -d '^' -f1 | sed 's#||#address=/# ; s#$#/127.0.0.1#' | sort | uniq >$tmp.$$
 	[ $? -eq 0 ] && sudo mv -f $tmp.$$ $out && wc -l $out || echo -42
@@ -14,8 +14,8 @@ easylist() {
 
 easylist_fr() {
 	echo -n 'Getting EasyList FR list ... '
-	out=$DEST/easylist_fr.conf
-	tmp=$(mktemp)
+	local out=$DEST/easylist_fr.conf
+	local tmp=$(mktemp)
 	wget -q -nv https://easylist-downloads.adblockplus.org/liste_fr.txt -O $tmp
 	egrep '^\|\|([a-Z\.]+)\^$' $tmp | cut -d '^' -f1 | sed 's#||#address=/# ; s#$#/127.0.0.1#' | sort | uniq >$tmp.$$
 	[ $? -eq 0 ] && sudo mv -f $tmp.$$ $out && wc -l $out || echo -42
@@ -24,8 +24,8 @@ easylist_fr() {
 
 easyprivacy() {
 	echo -n 'Getting EasyPrivacy list ... '
-	out=$DEST/easyprivacy.conf
-	tmp=$(mktemp)
+	local out=$DEST/easyprivacy.conf
+	local tmp=$(mktemp)
 	wget -q -nv https://easylist-downloads.adblockplus.org/easyprivacy.txt -O $tmp
 	egrep '^\|\|([a-Z\.]+)[\^|\^\$third-party]$' $tmp | sed 's#||#address=/# ; s#\^.*#/127.0.0.1#' | sort | uniq >$tmp.$$
 	[ $? -eq 0 ] && sudo mv -f $tmp.$$ $out && wc -l $out || echo -42
@@ -34,8 +34,8 @@ easyprivacy() {
 
 rstop() {
 	echo -n 'Getting RStop list ... '
-	out=$DEST/rstop.conf
-	tmp=$(mktemp)
+	local out=$DEST/rstop.conf
+	local tmp=$(mktemp)
 	wget -q -nv 'https://raw.githubusercontent.com/BoboTiG/rstop-list/master/rstop.conf' -O $tmp
 	[ $? -eq 0 ] && sudo mv -f $tmp $out && wc -l $out || echo -42
 }
@@ -48,5 +48,3 @@ easylist_fr
 sudo chmod 755 $DEST/*.conf
 
 sudo /usr/local/bin/gravity.sh
-
-exit 0
